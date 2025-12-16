@@ -6,7 +6,7 @@ from openai import OpenAI
 # Load environment variables
 load_dotenv()
 
-# Page config MUST come after importing streamlit
+# Page config 
 st.set_page_config(page_title="GenAI FAQ Chatbot", page_icon="🤖")
 
 # OpenAI client
