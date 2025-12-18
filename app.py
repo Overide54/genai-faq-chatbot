@@ -1,17 +1,16 @@
 import os
 from dotenv import load_dotenv
-
-load_dotenv()
-
 import streamlit as st
 from groq import Groq
+
+load_dotenv()
 
 st.set_page_config(page_title="GenAI FAQ Chatbot", page_icon="🤖")
 
 api_key = os.getenv("GROQ_API_KEY")
 
 if not api_key:
-    st.error("❌ GROQ_API_KEY not found. Please check .env or environment variables.")
+    st.error("❌ GROQ_API_KEY not found. Please check environment variables.")
     st.stop()
 
 client = Groq(api_key=api_key)
