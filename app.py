@@ -1,18 +1,21 @@
 import os
-import streamlit as st
 from dotenv import load_dotenv
-from openai import OpenAI
 
-# Load environment variables
 load_dotenv()
 
-# Page config MUST come after importing streamlit
+import streamlit as st
+from groq import Groq
+
 st.set_page_config(page_title="GenAI FAQ Chatbot", page_icon="🤖")
 
-# OpenAI client
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+api_key = os.getenv("GROQ_API_KEY")
 
-# FAQ context
+if not api_key:
+    st.error("❌ GROQ_API_KEY not found. Please check .env or environment variables.")
+    st.stop()
+
+client = Groq(api_key=api_key)
+
 faq_context = """
 Company working hours are from 9 AM to 6 PM.
 Employees are entitled to 20 paid leaves per year.
@@ -21,7 +24,6 @@ Employees must apply leave at least one day in advance.
 For system issues, contact IT support via internal ticketing system.
 """
 
-# UI
 st.title("🤖 GenAI FAQ Chatbot")
 st.write("Ask any HR or IT related question")
 
@@ -31,14 +33,14 @@ if st.button("Get Answer") and user_question:
     with st.spinner("Thinking... 🤖"):
         try:
             response = client.chat.completions.create(
-                model="gpt-4o-mini",
+                model="llama-3.1-8b-instant",
                 messages=[
                     {
                         "role": "system",
                         "content": (
-                            "You are a helpful company HR and IT support assistant. "
-                            "Answer ONLY based on the provided FAQ context. "
-                            "If the answer is not in the context, say "
+                            "You are a helpful HR and IT support assistant. "
+                            "Answer only from the provided FAQ context. "
+                            "If the answer is not present, say "
                             "'Please contact HR or IT support for this query.'"
                         )
                     },
@@ -54,9 +56,7 @@ if st.button("Get Answer") and user_question:
                 temperature=0.2
             )
 
-            answer = response.choices[0].message.content
-            st.success(answer)
+            st.success(response.choices[0].message.content)
 
         except Exception as e:
-            st.error(f"Error: {e}")
-
+            st.error(f"LLM Error: {e}")
